@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.vit.demo'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Not using JUnit/TestNG, so disable Gradle's built-in test task
+// to avoid it trying (and possibly failing) to discover a test framework.
+tasks.named('test') {
+    enabled = false
+}
+
+// Runs AppTest.main() directly. If it throws, this task (and the build) fails.
+task runTest(type: JavaExec) {
+    dependsOn compileTestJava
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+    mainClass.set('com.vit.demo.AppTest')
+}
+
+tasks.named('check') {
+    dependsOn runTest
+}
+
+tasks.named('jar') {
+    dependsOn runTest
+    archiveBaseName.set('ci-jenkins-demo')
+    archiveVersion.set('1.0.0')
+    manifest {
+        attributes 'Main-Class': 'com.vit.demo.App'
+    }
+}
