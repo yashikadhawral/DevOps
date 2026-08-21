@@ -6,45 +6,57 @@ pipeline {
         maven 'Maven-3'
     }
 
+    environment {
+        PROJECT_DIR = 'jenkins-tomcat-demo'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 echo 'Downloading source code from GitHub'
                 git branch: 'main',
-                    url: 'https://github.com/yashikadhawral/jenkins-tomcat-demo.git'
+                    url: 'https://github.com/yashikadhawral/DevOps.git'
             }
         }
 
         stage('Compile') {
             steps {
-                echo 'Compiling Java application'
-                bat 'mvn clean compile'
+                dir("${PROJECT_DIR}") {
+                    echo 'Compiling Java application'
+                    bat 'mvn clean compile'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Executing JUnit tests'
-                bat 'mvn test'
+                dir("${PROJECT_DIR}") {
+                    echo 'Executing JUnit tests'
+                    bat 'mvn test'
+                }
             }
         }
 
         stage('Package') {
             steps {
-                echo 'Creating WAR file'
-                bat 'mvn package -DskipTests'
-                archiveArtifacts artifacts: 'target/*.war',
-                    fingerprint: true
+                dir("${PROJECT_DIR}") {
+                    echo 'Creating WAR file'
+                    bat 'mvn package -DskipTests'
+                    archiveArtifacts artifacts: 'target/*.war',
+                        fingerprint: true
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying application to Tomcat'
-                bat '''
-                    copy /Y target\\jenkins-demo.war ^
-                    "C:\\apache-tomcat-11.0.24\\webapps\\jenkins-demo.war"
-                '''
+                dir("${PROJECT_DIR}") {
+                    echo 'Deploying application to Tomcat'
+                    bat '''
+                        copy /Y target\\jenkins-demo.war ^
+                        "C:\\apache-tomcat-11.0.24\\webapps\\jenkins-demo.war"
+                    '''
+                }
             }
         }
 
@@ -62,7 +74,7 @@ pipeline {
     post {
         always {
             junit allowEmptyResults: true,
-                testResults: 'target/surefire-reports/*.xml'
+                testResults: "${PROJECT_DIR}/target/surefire-reports/*.xml"
         }
         success {
             echo 'CI/CD PIPELINE SUCCESSFUL'
