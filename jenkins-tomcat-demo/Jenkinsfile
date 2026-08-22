@@ -54,7 +54,7 @@ pipeline {
                     echo 'Deploying application to Tomcat'
                     bat '''
                         copy /Y target\\jenkins-demo.war ^
-                        "C:\\apache-tomcat-11.0.24\\webapps\\jenkins-demo.war"
+                        "C:\\Program Files\\Apache Software Foundation\\Tomcat 11.0\\webapps\\jenkins-demo.war"
                     '''
                 }
             }
